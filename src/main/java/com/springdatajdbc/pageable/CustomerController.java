@@ -38,7 +38,21 @@ public class CustomerController {
     @GetMapping(value = "/findListByNameParamQuery")
     public ResponseEntity<?> findListByNameParamQuery(@RequestParam String name, Pageable pagable) {
         // Pageing works, sort did not
-        List<Customer> custList = customerRepository.findListByNameParamQuery(name, pagable);
+        Integer limit = pagable.getPageSize();
+        Long offset = pagable.getOffset();
+        List<Customer> custList = customerRepository.findListByNameParamQuery(name, pagable, limit, offset);
+        Long count = customerRepository.countByName(name);
+        Page<Customer> customerPage = PageableExecutionUtils.getPage(custList, pagable, () -> count);
+        return ResponseEntity.ok().body(customerPage);
+    }
+
+    @GetMapping(value = "/findListByNameParamQuerySort")
+    public ResponseEntity<?> findListByNameParamQuerySort(@RequestParam String name, Pageable pagable) {
+        // Pageing works, sort did not
+        Integer limit = pagable.getPageSize();
+        Long offset = pagable.getOffset();
+        String sort = "name";
+        List<Customer> custList = customerRepository.findListByNameParamQuerySort(name, pagable, limit, offset, sort);
         Long count = customerRepository.countByName(name);
         Page<Customer> customerPage = PageableExecutionUtils.getPage(custList, pagable, () -> count);
         return ResponseEntity.ok().body(customerPage);
